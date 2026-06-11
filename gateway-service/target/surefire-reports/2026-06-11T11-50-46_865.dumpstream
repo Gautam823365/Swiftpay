@@ -1,5 +1,0 @@
-# Created at 2026-06-11T11:50:47.216
-Boot Manifest-JAR contains absolute paths in classpath 'E:\swiftpay\gateway-service\target\test-classes'
-Hint: <argLine>-Djdk.net.URLClassPath.disableClassPathURLCheck=true</argLine>
-'other' has different root
-
