@@ -5,19 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d2aefed9-1d32-4e6d-9014-7061f6fae2b1" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gateway-service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/gateway-service/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gateway-service/target/gateway-service-1.0.0-SNAPSHOT.jar" beforeDir="false" afterPath="$PROJECT_DIR$/gateway-service/target/gateway-service-1.0.0-SNAPSHOT.jar" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gateway-service/target/surefire-reports/2026-06-11T11-50-46_865.dumpstream" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gateway-service/target/surefire-reports/TEST-com.swiftpay.gateway.PaymentServiceTest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/gateway-service/target/surefire-reports/TEST-com.swiftpay.gateway.PaymentServiceTest.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gateway-service/target/surefire-reports/com.swiftpay.gateway.PaymentServiceTest.txt" beforeDir="false" afterPath="$PROJECT_DIR$/gateway-service/target/surefire-reports/com.swiftpay.gateway.PaymentServiceTest.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ledger-service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ledger-service/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ledger-service/target/ledger-service-1.0.0-SNAPSHOT.jar" beforeDir="false" afterPath="$PROJECT_DIR$/ledger-service/target/ledger-service-1.0.0-SNAPSHOT.jar" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ledger-service/target/surefire-reports/2026-06-11T11-53-37_026.dumpstream" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ledger-service/target/surefire-reports/TEST-com.swiftpay.ledger.LedgerServiceTest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ledger-service/target/surefire-reports/TEST-com.swiftpay.ledger.LedgerServiceTest.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ledger-service/target/surefire-reports/com.swiftpay.ledger.LedgerServiceTest.txt" beforeDir="false" afterPath="$PROJECT_DIR$/ledger-service/target/surefire-reports/com.swiftpay.ledger.LedgerServiceTest.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
