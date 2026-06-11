@@ -1,149 +1,106 @@
-🚀 SwiftPay — High-Performance Distributed Payment System
+# SwiftPay — Real-Time Payment Ledger
 
-A production-style, event-driven payment processing system built with Spring Boot, Kafka, PostgreSQL, and Redis, designed to simulate real-world fintech ledger workloads and validated under high-throughput load testing (250 TPS, 1M+ transactions) using k6.
+A resilient, event-driven P2P payment platform built with Spring Boot 3, Kafka, Redis, and PostgreSQL.
 
-📌 Overview
+## Architecture
 
-SwiftPay simulates a real-world payment infrastructure used in fintech systems where:
+```
+Client → Gateway Service (8080) → Kafka → Ledger Service (8081) → PostgreSQL
+                     ↑↓ Redis (idempotency + balance cache)
+```
 
-Payments are initiated via a Gateway Service
-Events are published to Kafka
-A Ledger Service processes transactions atomically
-Account balances are updated safely using database row-level locking
-Transaction results are published back to Kafka
+## Quick Start
 
-🏗️ System Architecture
-Client
-   ↓
-Gateway Service
-   ↓
-Kafka (payment.initiated)
-   ↓
-Ledger Service
-   ↓
-PostgreSQL (Accounts + Transactions)
-   ↓
-Kafka (payment.completed / payment.failed)
-⚙️ Tech Stack
-☕ Java 21 + Spring Boot
-📨 Apache Kafka (event-driven architecture)
-🐘 PostgreSQL (ACID transactions)
-🔴 Redis (idempotency + deduplication)
-📊 k6 (load testing)
-📈 Grafana (observability & metrics)
-🐳 Docker Compose (local infrastructure)
-🔄 Payment Flow
-Client sends request to Gateway (POST /v1/payments)
-Gateway Service:
-Validates request
-Ensures idempotency using Redis
-Persists transaction as PENDING
-Publishes PaymentInitiatedEvent to Kafka
-Ledger Service:
-Consumes event from Kafka
-Locks sender & receiver accounts (deadlock-safe ordering)
-Performs atomic debit/credit
-Updates transaction status
-Result is published to Kafka:
-payment.completed
-payment.failed
-🚀 API
-Create Payment
+```bash
+# Start the full stack
+docker compose up --build
 
-POST /v1/payments
+# Gateway Swagger UI
+open http://localhost:8080/swagger-ui.html
 
+# Ledger Swagger UI
+open http://localhost:8081/swagger-ui.html
+```
+
+## API
+
+### POST /v1/payments
+Initiate a P2P payment. Idempotent via `idempotencyKey`.
+
+```json
 {
-  "idempotencyKey": "a12b34c56d78e90f",
-  "senderId": "uuid",
-  "receiverId": "uuid",
-  "amount": 100.50,
-  "currency": "USD"
+  "idempotencyKey": "550e8400-e29b-41d4-a716-446655440000",
+  "senderId":       "a0000000-0000-0000-0000-000000000001",
+  "receiverId":     "a0000000-0000-0000-0000-000000000002",
+  "amount":         "100.00",
+  "currency":       "USD"
 }
-Response
-{
-  "transactionId": "uuid",
-  "status": "PENDING"
-}
-🧪 Load Testing (k6)
-Scenario
-Constant load: 250 TPS
-Duration: 15 minutes
-Total requests: ~225K–300K per run
-Max VUs: 1000
-Run Command
-k6 run -e BASE_URL=http://localhost:8080 load-test.js
-📊 Performance Results
-Observed Metrics
-✅ Success rate: 99.99%+
-⚡ Average latency: 18ms – 150ms
-📈 P95 latency: < 100ms (steady state)
-❗ Minimal failure rate under sustained load
-System Behavior Under Load
-Kafka maintained stable throughput with no backlog spikes
-HikariCP connection pool remained stable under tuning
-No service crashes under sustained 250 TPS workload
-🧠 Key Engineering Decisions
-1. Event-Driven Architecture
-Decouples Gateway and Ledger services
-Enables horizontal scalability
-Improves resilience under load
-2. Redis-based Idempotency
-Prevents duplicate payments
-Ensures safe retry behavior under load
-3. Deadlock-Safe Account Locking
-Accounts locked in deterministic UUID order
-Prevents circular wait conditions in DB
-4. Kafka Async Processing
-High throughput, non-blocking pipeline
-Supports horizontal scaling via partitions
-⚡ Performance Tuning
-Database (HikariCP)
-maximum-pool-size: 40
-minimum-idle: 5
-connection-timeout: 30000
-Kafka
-Async producer enabled
-JSON serialization for event payloads
-Partition-based scaling enabled
-Service Optimization
-Lightweight DTO-based event payloads
-Reduced blocking logic in API layer
-Optimized transaction boundaries
-📦 Running Locally
-1. Start infrastructure
-docker-compose up -d
-2. Build services
-mvn clean install -DskipTests
-3. Run services
-# Gateway Service
-cd gateway-service && mvn spring-boot:run
+```
 
-# Ledger Service
-cd ledger-service && mvn spring-boot:run
-📈 Monitoring
+**Responses:**
+- `202 Accepted` — payment queued
+- `400 Bad Request` — validation failure
+- `404 Not Found` — unknown account
+- `409 Conflict` — duplicate idempotency key
+- `422 Unprocessable Entity` — insufficient funds
 
-Grafana dashboards track:
+### GET /v1/ledger/{userId}/transactions?page=0&size=20
+Paginated transaction history for a user.
 
-TPS (Throughput)
-Kafka consumer lag
-Database connection pool usage
-API latency (p95/p99)
-Error rates
-📡 Load Test Artifacts
-k6 script: /load-test/load-test.js
-Results logs: /load-test/results/
-Optional: PCAP capture via tcpdump / Wireshark
-🧩 Future Improvements
-Add OpenTelemetry distributed tracing
-Kafka retry + DLQ mechanism
-Saga pattern for multi-step payments
-Rate limiting at API gateway
-Ledger sharding by region/account segments
-🏁 Summary
+## Seed Accounts (for testing)
 
-SwiftPay demonstrates a production-grade distributed payment system capable of:
+| ID | Balance |
+|----|---------|
+| `a0000000-0000-0000-0000-000000000001` | $10,000 |
+| `a0000000-0000-0000-0000-000000000002` | $5,000  |
+| `a0000000-0000-0000-0000-000000000003` | $250    |
 
-Sustaining 250 TPS+ load
-Processing hundreds of thousands of transactions reliably
-Maintaining low-latency (<100ms p95) performance
-Ensuring safe, ACID-compliant financial operations
+## Load Test
+
+```bash
+# Requires k6 (https://k6.io/docs/get-started/installation/)
+k6 run load-test/k6-script.js
+
+# Custom base URL
+k6 run -e BASE_URL=http://localhost:8080 load-test/k6-script.js
+```
+
+Target: 250 TPS sustained for 60 minutes (~1M transactions).
+
+Capture PCAP while running:
+```bash
+sudo tcpdump -i lo -w trace.pcap port 8080 or port 5432 or port 9092
+```
+
+## Running Tests
+
+```bash
+# Unit tests (no infra needed)
+cd gateway-service && mvn test
+cd ledger-service  && mvn test
+
+# Integration tests (Testcontainers spins up Postgres + Kafka + Redis automatically)
+cd gateway-service && mvn verify
+cd ledger-service  && mvn verify
+```
+
+## Environment Variables
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `DB_HOST` | `localhost` | PostgreSQL host |
+| `DB_PORT` | `5432` | PostgreSQL port |
+| `DB_NAME` | `swiftpay` | Database name |
+| `DB_USER` | `swiftpay` | DB username |
+| `DB_PASS` | `swiftpay` | DB password |
+| `KAFKA_BROKERS` | `localhost:9092` | Kafka bootstrap servers |
+| `REDIS_HOST` | `localhost` | Redis host |
+| `REDIS_PORT` | `6379` | Redis port |
+
+## Health Checks
+
+- Gateway: `GET http://localhost:8080/actuator/health`
+- Ledger:  `GET http://localhost:8081/actuator/health`
+#   S w i f t p a y 
+ 
+ 
