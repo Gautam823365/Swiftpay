@@ -8,11 +8,9 @@ com\swiftpay\gateway\config\KafkaConfig.class
 com\swiftpay\gateway\repository\AccountRepository.class
 com\swiftpay\gateway\dto\ErrorResponse.class
 com\swiftpay\gateway\dto\PaymentResponse$PaymentResponseBuilder.class
-com\swiftpay\gateway\kafka\PaymentInitiatedEvent$PaymentInitiatedEventBuilder.class
 com\swiftpay\gateway\model\Transaction.class
 com\swiftpay\gateway\service\PaymentService$DuplicatePaymentException.class
 com\swiftpay\gateway\dto\PaymentRequest.class
-com\swiftpay\gateway\kafka\PaymentInitiatedEvent.class
 com\swiftpay\gateway\service\PaymentService$AccountNotFoundException.class
 com\swiftpay\gateway\service\PaymentService$InsufficientFundsException.class
 com\swiftpay\gateway\service\PaymentService.class

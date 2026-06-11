@@ -19,6 +19,11 @@
         <spring-boot.version>3.2.5</spring-boot.version>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
+
+            <!-- REQUIRED FOR ALL MODULES -->
+            <lombok.version>1.18.30</lombok.version>
+            <mapstruct.version>1.5.5.Final</mapstruct.version>
+
     </properties>
 
     <dependencyManagement>

@@ -7,7 +7,6 @@ E:\swiftpay\gateway-service\src\main\java\com\swiftpay\gateway\dto\PaymentReques
 E:\swiftpay\gateway-service\src\main\java\com\swiftpay\gateway\dto\PaymentResponse.java
 E:\swiftpay\gateway-service\src\main\java\com\swiftpay\gateway\GatewayApplication.java
 E:\swiftpay\gateway-service\src\main\java\com\swiftpay\gateway\kafka\PaymentEventProducer.java
-E:\swiftpay\gateway-service\src\main\java\com\swiftpay\gateway\kafka\PaymentInitiatedEvent.java
 E:\swiftpay\gateway-service\src\main\java\com\swiftpay\gateway\model\Account.java
 E:\swiftpay\gateway-service\src\main\java\com\swiftpay\gateway\model\Transaction.java
 E:\swiftpay\gateway-service\src\main\java\com\swiftpay\gateway\model\TransactionStatus.java
