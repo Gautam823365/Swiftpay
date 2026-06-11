@@ -1,51 +1,57 @@
-🚀 SwiftPay — High-Performance Payment Processing System
+🚀 SwiftPay — High-Performance Distributed Payment System
 
-A distributed, event-driven payment processing system built using Spring Boot, Kafka, PostgreSQL, Redis, and validated under high load (250 TPS, 1M+ transactions) using k6 performance testing.
+A production-style, event-driven payment processing system built with Spring Boot, Kafka, PostgreSQL, and Redis, designed to simulate real-world fintech ledger workloads and validated under high-throughput load testing (250 TPS, 1M+ transactions) using k6.
 
-📌 System Overview
+📌 Overview
 
-SwiftPay is designed to simulate a real-world fintech ledger system where:
+SwiftPay simulates a real-world payment infrastructure used in fintech systems where:
 
 Payments are initiated via a Gateway Service
 Events are published to Kafka
 A Ledger Service processes transactions atomically
-Account balances are updated safely using DB locks
-Results are published back via Kafka topics
-🏗️ Architecture
-Client → Gateway Service → Kafka (payment.initiated)
-                                ↓
-                         Ledger Service
-                                ↓
-        PostgreSQL (Accounts + Transactions)
-                                ↓
+Account balances are updated safely using database row-level locking
+Transaction results are published back to Kafka
+
+🏗️ System Architecture
+Client
+   ↓
+Gateway Service
+   ↓
+Kafka (payment.initiated)
+   ↓
+Ledger Service
+   ↓
+PostgreSQL (Accounts + Transactions)
+   ↓
 Kafka (payment.completed / payment.failed)
 ⚙️ Tech Stack
 ☕ Java 21 + Spring Boot
-📨 Apache Kafka (event-driven pipeline)
-🐘 PostgreSQL (transactional consistency)
-🔴 Redis (idempotency + caching)
+📨 Apache Kafka (event-driven architecture)
+🐘 PostgreSQL (ACID transactions)
+🔴 Redis (idempotency + deduplication)
 📊 k6 (load testing)
-📈 Grafana (monitoring)
-🐳 Docker Compose (local infra)
-🔄 Core Flow
-Client sends payment request to Gateway
-Gateway:
+📈 Grafana (observability & metrics)
+🐳 Docker Compose (local infrastructure)
+🔄 Payment Flow
+Client sends request to Gateway (POST /v1/payments)
+Gateway Service:
 Validates request
-Ensures idempotency (Redis)
-Saves transaction as PENDING
+Ensures idempotency using Redis
+Persists transaction as PENDING
 Publishes PaymentInitiatedEvent to Kafka
 Ledger Service:
-Consumes event
-Locks sender & receiver accounts
-Debits & credits atomically
+Consumes event from Kafka
+Locks sender & receiver accounts (deadlock-safe ordering)
+Performs atomic debit/credit
 Updates transaction status
-Result published to Kafka:
+Result is published to Kafka:
 payment.completed
 payment.failed
-🚀 API Endpoint
+🚀 API
 Create Payment
+
 POST /v1/payments
-Sample Request
+
 {
   "idempotencyKey": "a12b34c56d78e90f",
   "senderId": "uuid",
@@ -60,34 +66,36 @@ Response
 }
 🧪 Load Testing (k6)
 Scenario
-Load: 250 TPS constant arrival rate
+Constant load: 250 TPS
 Duration: 15 minutes
-Total: ~225,000+ requests per run
-Peak VUs: 1000
+Total requests: ~225K–300K per run
+Max VUs: 1000
 Run Command
 k6 run -e BASE_URL=http://localhost:8080 load-test.js
 📊 Performance Results
 Observed Metrics
-✅ Success rate: ~99.99%
-⚡ Avg latency: 18ms – 150ms
+✅ Success rate: 99.99%+
+⚡ Average latency: 18ms – 150ms
 📈 P95 latency: < 100ms (steady state)
-❗ Minimal failure rate under extreme burst load
-System Behavior
-Kafka handled sustained throughput without backlog spikes
-DB connection pool stabilized under load (HikariCP tuning)
-No service crashes under 250 TPS sustained load
+❗ Minimal failure rate under sustained load
+System Behavior Under Load
+Kafka maintained stable throughput with no backlog spikes
+HikariCP connection pool remained stable under tuning
+No service crashes under sustained 250 TPS workload
 🧠 Key Engineering Decisions
 1. Event-Driven Architecture
-Decouples Gateway & Ledger
-Enables horizontal scaling
-2. Idempotency via Redis
+Decouples Gateway and Ledger services
+Enables horizontal scalability
+Improves resilience under load
+2. Redis-based Idempotency
 Prevents duplicate payments
-Critical for load reliability
-3. UUID-based ordering lock strategy
-Prevents DB deadlocks during transfers
-4. Kafka-based async processing
-Ensures high throughput
-Smooth backpressure handling
+Ensures safe retry behavior under load
+3. Deadlock-Safe Account Locking
+Accounts locked in deterministic UUID order
+Prevents circular wait conditions in DB
+4. Kafka Async Processing
+High throughput, non-blocking pipeline
+Supports horizontal scaling via partitions
 ⚡ Performance Tuning
 Database (HikariCP)
 maximum-pool-size: 40
@@ -95,46 +103,47 @@ minimum-idle: 5
 connection-timeout: 30000
 Kafka
 Async producer enabled
-JSON serialization for events
-Partition-based scaling support
-JVM / Service
-Lightweight DTOs for event transport
-Reduced blocking operations in API layer
+JSON serialization for event payloads
+Partition-based scaling enabled
+Service Optimization
+Lightweight DTO-based event payloads
+Reduced blocking logic in API layer
+Optimized transaction boundaries
 📦 Running Locally
 1. Start infrastructure
 docker-compose up -d
 2. Build services
 mvn clean install -DskipTests
 3. Run services
-# Gateway
+# Gateway Service
 cd gateway-service && mvn spring-boot:run
 
-# Ledger
+# Ledger Service
 cd ledger-service && mvn spring-boot:run
-📈 Monitoring (Grafana)
+📈 Monitoring
 
-Dashboards track:
+Grafana dashboards track:
 
-TPS
-Kafka throughput
-DB connection usage
+TPS (Throughput)
+Kafka consumer lag
+Database connection pool usage
 API latency (p95/p99)
 Error rates
 📡 Load Test Artifacts
 k6 script: /load-test/load-test.js
 Results logs: /load-test/results/
-(Optional) PCAP capture using Wireshark/tcpdump
-📌 Known Improvements / Future Work
-Add distributed tracing (OpenTelemetry)
-Kafka retry + DLQ handling
+Optional: PCAP capture via tcpdump / Wireshark
+🧩 Future Improvements
+Add OpenTelemetry distributed tracing
+Kafka retry + DLQ mechanism
 Saga pattern for multi-step payments
-Rate limiting at gateway layer
-Sharding ledger by account region
+Rate limiting at API gateway
+Ledger sharding by region/account segments
 🏁 Summary
 
-SwiftPay demonstrates a production-grade payment pipeline capable of handling:
+SwiftPay demonstrates a production-grade distributed payment system capable of:
 
-High-throughput traffic (250 TPS sustained)
-Fault-tolerant event processing
-Safe financial transaction handling
-Scalable Kafka-based architecture
+Sustaining 250 TPS+ load
+Processing hundreds of thousands of transactions reliably
+Maintaining low-latency (<100ms p95) performance
+Ensuring safe, ACID-compliant financial operations
