@@ -1,14 +1,10 @@
 FROM maven:3.9.6-eclipse-temurin-21 AS builder
 
 WORKDIR /build
-
 COPY . .
 
-# Build full Maven reactor (parent + modules)
-RUN mvn clean install -DskipTests
-
-# Build only gateway service
-RUN mvn clean package -pl gateway-service -am -DskipTests
+# FORCE Maven to treat root as parent reactor
+RUN mvn -f pom.xml clean package -pl gateway-service -am -DskipTests
 
 
 FROM eclipse-temurin:21-jre-alpine

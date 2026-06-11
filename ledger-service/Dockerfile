@@ -1,14 +1,9 @@
 FROM maven:3.9.6-eclipse-temurin-21 AS builder
 
 WORKDIR /build
-
 COPY . .
 
-# Build full reactor first (IMPORTANT)
-RUN mvn clean install -DskipTests
-
-# Build ledger module
-RUN mvn clean package -pl ledger-service -am -DskipTests
+RUN mvn -f pom.xml clean package -pl ledger-service -am -DskipTests
 
 
 FROM eclipse-temurin:21-jre-alpine
