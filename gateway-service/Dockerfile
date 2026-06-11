@@ -4,7 +4,7 @@ WORKDIR /build
 
 COPY . .
 
-RUN mvn -pl gateway-service -am clean package -DskipTests
+RUN mvn clean package -DskipTests
 
 FROM eclipse-temurin:21-jre-alpine
 
