@@ -5,6 +5,7 @@ WORKDIR /build
 COPY . .
 
 RUN mvn clean package -DskipTests
+RUN mvn clean package -pl ledger-service -am -DskipTests
 
 FROM eclipse-temurin:21-jre-alpine
 
